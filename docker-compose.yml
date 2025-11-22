@@ -1,0 +1,78 @@
+#____________________________________________________________________________________________________________________
+# Serviços principais
+#____________________________________________________________________________________________________________________
+services:
+  app:
+    build: .
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - REDIS_URL=redis://redis:6379/0
+      - RABBIT_URL=amqp://guest:guest@rabbitmq:5672/
+      - SERVICE=api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    restart: unless-stopped
+
+  consumer:
+    build: .
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - REDIS_URL=redis://redis:6379/0
+      - RABBIT_URL=amqp://guest:guest@rabbitmq:5672/
+      - SERVICE=consumer
+    volumes:
+      - ./:/app
+    command: ["python", "-m", "src.consumer"]
+    restart: unless-stopped
+
+#____________________________________________________________________________________________________________________
+# Banco de Dados: MongoDB
+#____________________________________________________________________________________________________________________
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+#____________________________________________________________________________________________________________________
+# Cache e Key-Value Store: Redis
+#____________________________________________________________________________________________________________________
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+#____________________________________________________________________________________________________________________
+# Broker de Mensagens: RabbitMQ
+#____________________________________________________________________________________________________________________
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+#____________________________________________________________________________________________________________________
+# Volumes persistentes
+#____________________________________________________________________________________________________________________
+volumes:
+  mongo_data:

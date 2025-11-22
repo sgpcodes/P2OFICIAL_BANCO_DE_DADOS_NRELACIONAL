@@ -1,5 +1,3 @@
-# ...existing code...
-# TransFlow - protótipo
 
 Instalação local (venv):
 1. python -m venv .venv
@@ -23,7 +21,6 @@ Endpoints:
 - GET /corridas/{forma_pagamento}
 - GET /saldo/{motorista}
 
-# ...existing code...# TransFlow — Protótipo
 
 TransFlow é um protótipo de sistema para processar corridas: API que registra corridas, publica eventos em RabbitMQ e um consumer que atualiza saldo no Redis e confirma o registro no MongoDB.
 
@@ -133,3 +130,4 @@ Contribuição
 
 Licença
 - Sem licença definida. Adicione uma license file se desejar (ex: MIT).
+
